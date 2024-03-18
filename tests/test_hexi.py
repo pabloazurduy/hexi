@@ -1,5 +1,5 @@
 import pytest
-from hexi import Board, BoardState, Player, Game, PlayerID
+from hexi import Board , Player, Game, PlayerID, Plotter
 
 class TestBoard:
     @pytest.mark.parametrize("size", [5, 10000, 1])
@@ -19,6 +19,15 @@ class TestBoard:
         for hex_id in board.last_state.keys():
             board.play_take(hex_id, PlayerID.PLAYER_1)
         assert board.is_finished
+
+    def test_plot_state(self):
+        board = Board.generate_random(5, 0, 0, 1)
+        assert not board.is_finished
+        for hex_id in board.last_state.keys():
+            board.play_take(hex_id, PlayerID.PLAYER_1)
+            Plotter.plot_state(board.last_state)
+        assert board.is_finished
+
 
 class TestPlayer:
     class MockPlayer(Player):

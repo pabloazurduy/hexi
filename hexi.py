@@ -74,17 +74,6 @@ class Board:
         else:
             raise NotValidPlay(f'hexagon {hex_id} already taken {new_state[hex_id].state = }')
   
-    
-    def plot_last_state(self):
-        self.plot_state(self.last_state)
-
-    @staticmethod
-    def plot_state(state: BoardState):
-        for hex_id, hex_state in state.hexagons.dict:
-            boundary = h3.h3_to_geo_boundary(hex_id, geo_json=True)
-            plt.fill(boundary[0], boundary[1], color='blue' if hex_state == PlayerID.PLAYER_1 else 'red')
-        plt.show()
-
     def make_gif(self):
         # Implementation for creating a GIF from all states
         raise NotImplementedError
@@ -100,6 +89,30 @@ class Player(Protocol):
 
     def next_play(self, board: Board) -> str:
         pass
+
+
+class Plotter:
+    
+    @staticmethod
+    def plot_state(state: BoardState):
+        from matplotlib.patches import Polygon
+        from matplotlib.collections import PatchCollection
+        fig, ax = plt.subplots()
+        patches = []
+
+        for h3_id, hex in state.items():
+            # Get the boundary of the hexagon
+            boundary = h3.h3_to_geo_boundary(h3_id)
+            # Create a polygon
+            color = 'red' if hex.state == PlayerID.PLAYER_1 else 'blue' if hex.state == PlayerID.PLAYER_2 else 'gray'
+            polygon = Polygon(boundary, closed=True, color= color)
+            patches.append(polygon)
+
+        p = PatchCollection(patches, match_original=True)
+        ax.add_collection(p)
+        plt.show()
+
+
 
 @dataclass
 class Game:
